@@ -351,6 +351,9 @@ html,body{margin:0;padding:0;min-height:100vh;font-family:'Inter',-apple-system,
   cursor:pointer;transition:all .15s;box-shadow:var(--shadow-sm);
 }
 .qa-card:hover{border-color:#94a3b8;box-shadow:var(--shadow-md);}
+.qa-card.qa-disabled{opacity:.45;cursor:default;pointer-events:none;}
+.qa-card.qa-disabled:hover{border-color:var(--br);box-shadow:none;}
+.qa-secondary{margin-top:0;}
 .qa-icon{
   width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
@@ -521,6 +524,8 @@ html,body{margin:0;padding:0;min-height:100vh;font-family:'Inter',-apple-system,
 .conf-total-bar span:first-child{color:rgba(255,255,255,.6);font-size:13px;font-weight:500;}
 .conf-total-bar span:last-child{color:#fff;font-size:18px;font-weight:800;}
 @media(max-width:480px){.conf-total-bar{margin:-16px;margin-top:12px;padding:14px 16px;}.conf-total-bar span:last-child{font-size:16px;}}
+.summary-icon{width:56px;height:56px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.summary-title{font-size:18px;font-weight:700;color:var(--fg);margin-bottom:16px;}
 
 .summary-row{
   display:flex;justify-content:space-between;align-items:center;
@@ -763,6 +768,12 @@ html,body{margin:0;padding:0;min-height:100vh;font-family:'Inter',-apple-system,
 .anim{animation:slideUp .35s ease-out both;}
 .ad1{animation-delay:.05s}.ad2{animation-delay:.1s}.ad3{animation-delay:.15s}.ad4{animation-delay:.2s}
 
+/* ── Screen transitions ── */
+.screen{opacity:0;transition:opacity .25s ease;}
+.screen.active{opacity:1;}
+.screen.active .page{animation:pageFadeIn .3s ease-out both;}
+@keyframes pageFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
 
 /* ═══════════════════════════════════════
    COMPREHENSIVE MOBILE SAFETY (≤ 480px)
@@ -954,7 +965,7 @@ html,body{margin:0;padding:0;min-height:100vh;font-family:'Inter',-apple-system,
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Top Up USD Balance
         </button>
-        <button class="hero-btn secondary">
+        <button class="hero-btn secondary" onclick="startWithdraw()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg>
           Withdraw to INR
         </button>
@@ -1065,15 +1076,17 @@ html,body{margin:0;padding:0;min-height:100vh;font-family:'Inter',-apple-system,
               <div class="qa-icon" style="background:#f0fdf4;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
               <div><div class="qa-label">Top Up USD Balance</div><div class="qa-desc">Add funds via bank transfer</div></div>
             </div>
-            <div class="qa-card">
-              <div class="qa-icon" style="background:#eff6ff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
-              <div><div class="qa-label">Buy US Stocks</div><div class="qa-desc">Place a new buy order</div></div>
-            </div>
-            <div class="qa-card">
+            <div class="qa-card" onclick="startWithdraw()">
               <div class="qa-icon" style="background:#fef3c7;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
               <div><div class="qa-label">Withdraw to INR</div><div class="qa-desc">Convert &amp; transfer to bank</div></div>
             </div>
-            <div class="qa-card">
+          </div>
+          <div class="quick-actions qa-secondary anim ad2">
+            <div class="qa-card qa-disabled">
+              <div class="qa-icon" style="background:#eff6ff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
+              <div><div class="qa-label">Buy US Stocks</div><div class="qa-desc">Place a new buy order</div></div>
+            </div>
+            <div class="qa-card qa-disabled">
               <div class="qa-icon" style="background:#faf5ff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
               <div><div class="qa-label">Tax Statement</div><div class="qa-desc">Download LRS &amp; TCS report</div></div>
             </div>
@@ -1514,6 +1527,197 @@ html,body{margin:0;padding:0;min-height:100vh;font-family:'Inter',-apple-system,
 </div>
 
 
+<!-- ═══════════════════════════════════════════════════
+     SCREEN W1 — WITHDRAW CHECKOUT
+═══════════════════════════════════════════════════ -->
+<div class="screen" id="sc-withdraw">
+  <nav class="navbar">
+    <div class="nav-left">
+      <button class="nav-back" onclick="go('sc-merchant')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      <div><div class="nav-title">Withdraw to INR</div><div class="nav-subtitle">Decentro Payment Gateway</div></div>
+    </div>
+  </nav>
+
+  <div class="page"><div class="content-xl">
+    <!-- Merchant badge -->
+    <div class="merchant-badge anim">
+      <div class="mb-logo" style="background:linear-gradient(135deg,#d97706,#f59e0b);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+      <div class="mb-info"><div class="mb-name">Withdraw to INR</div><div class="mb-desc">Convert USD balance &amp; transfer to your linked bank account</div></div>
+      <div class="mb-verified"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+
+    <div class="checkout-grid">
+      <!-- LEFT — Amount & Bank -->
+      <div>
+        <!-- Withdraw Amount -->
+        <div class="card anim ad1" style="margin-bottom:24px;">
+          <div class="card-header"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Withdraw Amount</div>
+          <div class="card-body">
+            <div class="amount-input-row">
+              <div class="amount-prefix"><span style="font-size:20px;margin-right:4px;">&#127482;&#127480;</span> USD</div>
+              <input class="amount-field" id="wdAmountInput" type="text" inputmode="decimal" placeholder="0.00" value="200.00" oninput="updateWdAmount()">
+            </div>
+            <div class="inr-line" id="wdInrEquiv">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              &#8776; &#8377;16,796.00 at &#8377;83.98/USD
+            </div>
+            <div class="chips">
+              <button class="chip" data-val="100" onclick="selectWdChip(this)">$100</button>
+              <button class="chip active" data-val="200" onclick="selectWdChip(this)">$200</button>
+              <button class="chip" data-val="500" onclick="selectWdChip(this)">$500</button>
+              <button class="chip" data-val="1000" onclick="selectWdChip(this)">$1,000</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank selection — linked only -->
+        <div class="card anim ad2">
+          <div class="card-header"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>Credit To Bank Account</div>
+          <div class="card-body">
+            <div class="bank-grid" id="wdBankGrid">
+              <!-- Populated by JS — only linked banks -->
+            </div>
+            <div id="wdNoBanks" style="display:none;flex-direction:column;align-items:center;padding:32px 16px;text-align:center;">
+              <div style="width:64px;height:64px;border-radius:50%;background:var(--sf);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+              </div>
+              <div style="font-size:15px;font-weight:700;color:var(--fg);">No linked bank accounts</div>
+              <div style="font-size:13px;color:var(--mu);margin-top:6px;line-height:1.5;">Link a bank account first using the Top Up flow to enable withdrawals</div>
+              <button class="btn btn-primary" style="margin-top:20px;height:44px;font-size:13px;" onclick="go('sc-checkout')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Top Up &amp; Link Bank</button>
+            </div>
+            <div class="security-row" id="wdSecurityRow">
+              <div class="security-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>256-bit SSL</div>
+              <div class="security-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>RBI Compliant</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT — Order Summary -->
+      <div class="anim ad3">
+        <div class="card order-summary">
+          <div class="card-header"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Withdrawal Summary</div>
+          <div class="card-body">
+            <div class="os-row"><span class="os-label">Withdraw Amount</span><span class="os-value" id="wdOsAmount">$200.00</span></div>
+            <div class="os-row"><span class="os-label">Exchange Rate</span><span class="os-value">&#8377;83.98 / USD</span></div>
+            <div class="os-row"><span class="os-label">INR Equivalent</span><span class="os-value" id="wdOsINR">&#8377;16,796.00</span></div>
+            <div class="os-row"><span class="os-label">Processing Fee</span><span class="os-value" id="wdOsFee">&#8377;0.00</span></div>
+            <div class="os-total"><span class="os-label">You'll Receive</span><span class="os-value" id="wdOsTotal">&#8377;16,796.00</span></div>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary btn-block btn-lg" id="wdCheckoutBtn" onclick="handleWdCheckout()">Withdraw &mdash; $200.00</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN W2 — WITHDRAW CONFIRM + OTP
+═══════════════════════════════════════════════════ -->
+<div class="screen" id="sc-wdotp">
+  <nav class="navbar">
+    <div class="nav-left">
+      <button class="nav-back" onclick="go('sc-withdraw')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      <div><div class="nav-title">Confirm Withdrawal</div><div class="nav-subtitle">OTP Verification</div></div>
+    </div>
+  </nav>
+
+  <div class="page"><div class="content-lg">
+    <div class="confirm-grid">
+      <!-- LEFT — Summary -->
+      <div class="card anim">
+        <div class="card-header" id="wdConfHeader">
+          <div class="bank-logo" id="wdConfBankLogo" style="background:#97144d;"><span style="font-size:9px;font-weight:800;color:#fff;" id="wdConfBankLogoText">AXIS</span></div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--fg);" id="wdConfBankLabel">Axis Bank &mdash; Savings A/C</div><div style="font-size:11px;color:var(--mu);" id="wdConfBankAcc">Account &bull;&bull;&bull;&bull;6742</div></div>
+        </div>
+        <div class="card-body">
+          <div class="summary-row"><span class="sum-label">Withdraw Amount</span><span class="sum-value lg" id="wdConfUSD">$200.00</span></div>
+          <div class="summary-row"><span class="sum-label">Exchange Rate</span><span class="sum-value">&#8377;83.98 / USD</span></div>
+          <div class="summary-row"><span class="sum-label">INR Equivalent</span><span class="sum-value" id="wdConfINR">&#8377;16,796.00</span></div>
+          <div class="summary-row"><span class="sum-label">Processing Fee</span><span class="sum-value">&#8377;0.00</span></div>
+          <div class="conf-total-bar"><span>You'll Receive</span><span id="wdConfPayAmt">&#8377;16,796.00</span></div>
+        </div>
+      </div>
+
+      <!-- RIGHT — OTP -->
+      <div class="anim ad1">
+        <div class="card"><div class="card-body" style="text-align:center;">
+          <div class="otp-hero">
+            <div class="otp-icon" style="background:#fef3c7;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div class="otp-title">Verify Withdrawal</div>
+            <div class="otp-sub">Enter the 6-digit code sent to +91 &bull;&bull;&bull;&bull;7890</div>
+          </div>
+          <div class="otp-grid" id="wdOtpGrid"></div>
+          <div class="otp-timer" style="margin-top:14px;">Resend in <span id="wdCountdown">00:30</span></div>
+          <div style="margin-top:24px;"><button class="btn btn-primary btn-block btn-lg" id="wdPayBtn" disabled onclick="handleWdPay()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Confirm Withdrawal</button></div>
+        </div></div>
+        <div class="info-note" style="margin-top:16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div class="info-note-text"><strong>INR Credit</strong> Amount will be credited to your linked bank account within 1&ndash;2 business days after processing.</div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN W3 — WITHDRAW SUCCESS
+═══════════════════════════════════════════════════ -->
+<div class="screen" id="sc-wdsuccess">
+  <nav class="navbar">
+    <div class="nav-left"><div class="nav-title">Withdrawal Initiated</div></div>
+  </nav>
+  <div class="page"><div class="content-lg">
+    <div class="success-hero anim">
+      <div class="success-check" style="background:#fef3c7;box-shadow:0 0 0 12px #fefce8,0 0 0 24px rgba(254,243,199,.15);"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="success-amount" id="wdSuccessAmt">$200.00 Withdrawn!</div>
+      <div class="success-sub">INR will be credited to your bank account within 1&ndash;2 business days</div>
+      <div class="success-badge" style="background:#fef3c7;color:#92400e;border-color:#fde68a;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Withdrawal Initiated</div>
+    </div>
+
+    <div class="txn-bar anim ad1">
+      <div><div class="txn-bar-label">Transaction ID</div><div class="txn-bar-id" id="wdTxnIdVal">DEC-WDR-2426042287</div></div>
+      <button class="copy-btn" onclick="copyWdTxnId()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    </div>
+
+    <div class="success-grid anim ad2">
+      <!-- LEFT — Details -->
+      <div class="card"><div class="card-body">
+        <div class="detail-cell"><span class="dc-label">Withdraw Amount</span><span class="dc-value" style="font-size:15px;font-weight:700;" id="wdSuccessUSD">$200.00</span></div>
+        <div class="detail-cell"><span class="dc-label">Credit To</span><span class="dc-value" id="wdSuccessBank">Axis Bank &bull;&bull;&bull;&bull;6742</span></div>
+        <div class="detail-cell"><span class="dc-label">You'll Receive</span><span class="dc-value" id="wdSuccessCredit">&#8377;16,796.00</span></div>
+        <div class="detail-cell"><span class="dc-label">Exchange Rate</span><span class="dc-value">&#8377;83.98 / USD</span></div>
+        <div class="detail-cell"><span class="dc-label">Date &amp; Time</span><span class="dc-value" id="wdSuccessDate">22 Jun 2026, 10:14 AM</span></div>
+        <div class="detail-cell"><span class="dc-label">Purpose</span><span class="dc-value">Repatriation &mdash; INR Credit</span></div>
+        <div class="detail-cell"><span class="dc-label">New USD Balance</span><span class="dc-value" id="wdSuccessNewBal" style="color:#d97706;font-weight:700;">$1,047.50</span></div>
+      </div></div>
+
+      <!-- RIGHT — Next Actions -->
+      <div>
+        <div class="section-label">What's next?</div>
+        <div style="display:grid;gap:10px;">
+          <div class="next-action" onclick="go('sc-checkout')">
+            <div class="next-action-icon" style="background:#fef3c7;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div><div class="next-action-label">Top Up More</div><div class="next-action-desc">Add more funds to your USD balance</div></div>
+          </div>
+          <div class="next-action">
+            <div class="next-action-icon" style="background:#fef3c7;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div><div class="next-action-label">Download Receipt</div><div class="next-action-desc">Save for your records</div></div>
+          </div>
+        </div>
+        <div style="margin-top:20px;">
+          <button class="btn btn-outline btn-block btn-lg" onclick="go('sc-merchant')">Back to Demo Merchant</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+
 <!-- Loading overlay -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
@@ -1596,6 +1800,8 @@ function go(id){
   if(id==='sc-summary'){initOtpGrid('summaryOtpGrid',6,()=>{document.getElementById('summaryPayBtn').disabled=false});startTimer('summaryCountdown',30)}
   if(id==='sc-linkotp'){initOtpGrid('linkOtpGrid',6,onLinkOtpComplete);startTimer('linkCountdown',30)}
   if(id==='sc-bank'){document.getElementById('bankLoginCard').style.display='block';document.getElementById('bankOtpCard').style.display='none'}
+  if(id==='sc-wdotp'){initOtpGrid('wdOtpGrid',6,()=>{document.getElementById('wdPayBtn').disabled=false});startTimer('wdCountdown',30)}
+  if(id==='sc-withdraw'){populateWdBanks();updateWdCalc()}
   /* Toggle sticky "Powered by Decentro" — hide on homepage, bank login, and bank OTP screens */
   const sp=document.getElementById('stickyPowered');
   const hideOn=['sc-merchant','sc-bank'];
@@ -1847,6 +2053,128 @@ function copyTxnId(){
   navigator.clipboard.writeText(document.getElementById('txnIdVal').textContent)
     .then(()=>{document.querySelector('.copy-btn').classList.add('copied');showToast('Transaction ID copied!');setTimeout(()=>document.querySelector('.copy-btn').classList.remove('copied'),2000)})
     .catch(()=>showToast('Copied!'));
+}
+function copyWdTxnId(){
+  navigator.clipboard.writeText(document.getElementById('wdTxnIdVal').textContent)
+    .then(()=>showToast('Transaction ID copied!'))
+    .catch(()=>showToast('Copied!'));
+}
+
+/* ═══════════════════════════════════════════
+   WITHDRAW FLOW
+═══════════════════════════════════════════ */
+let wdAmount=200, wdBank=null;
+
+function startWithdraw(){
+  wdAmount=200;
+  go('sc-withdraw');
+}
+
+function populateWdBanks(){
+  const grid=document.getElementById('wdBankGrid');
+  const noBank=document.getElementById('wdNoBanks');
+  grid.innerHTML='';
+  let linked=[];
+  /* Collect linked banks from BANKS data */
+  Object.keys(BANKS).forEach(k=>{
+    if(BANKS[k].acc!==null)linked.push(k);
+  });
+  if(linked.length===0){
+    grid.style.display='none';noBank.style.display='flex';
+    wdBank=null;
+    document.getElementById('wdCheckoutBtn').disabled=true;
+    const sr=document.getElementById('wdSecurityRow');if(sr)sr.style.display='none';
+    return;
+  }
+  grid.style.display='';noBank.style.display='none';
+  document.getElementById('wdCheckoutBtn').disabled=false;
+  const sr=document.getElementById('wdSecurityRow');if(sr)sr.style.display='';
+  let first=true;
+  linked.forEach(k=>{
+    const b=BANKS[k];
+    const card=document.createElement('div');
+    card.className='bank-option linked'+(first?' selected':'');
+    card.id='wdbank-'+k;
+    card.setAttribute('onclick',"selectWdBank('"+k+"')");
+    card.innerHTML='<div class="bank-radio"></div>'
+      +'<div class="bank-logo" style="background:'+b.color+';"><span style="font-size:9px;font-weight:800;color:#fff;">'+b.short+'</span></div>'
+      +'<div class="bank-detail"><div class="bank-detail-name">'+b.name+'</div><div class="bank-detail-acc">••••'+b.acc+'</div></div>'
+      +'<span class="linked-tag">LINKED</span>';
+    grid.appendChild(card);
+    if(first){wdBank=k;first=false}
+  });
+}
+function selectWdBank(k){
+  wdBank=k;
+  document.querySelectorAll('#wdBankGrid .bank-option').forEach(c=>c.classList.remove('selected'));
+  const el=document.getElementById('wdbank-'+k);
+  if(el)el.classList.add('selected');
+}
+
+function updateWdAmount(){
+  const v=parseFloat(document.getElementById('wdAmountInput').value.replace(/[^0-9.]/g,''))||0;
+  wdAmount=v;updateWdCalc();
+}
+function selectWdChip(el){
+  wdAmount=parseInt(el.dataset.val);
+  document.getElementById('wdAmountInput').value=wdAmount.toFixed(2);
+  document.querySelectorAll('#sc-withdraw .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');updateWdCalc();
+}
+function updateWdCalc(){
+  const inr=wdAmount*RATE;
+  const fee=0;
+  const receive=inr-fee;
+  const f=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2});
+  document.getElementById('wdInrEquiv').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>≈ '+f(inr)+' at ₹'+RATE+'/USD';
+  document.getElementById('wdOsAmount').textContent='$'+wdAmount.toFixed(2);
+  document.getElementById('wdOsINR').textContent=f(inr);
+  document.getElementById('wdOsFee').textContent=f(fee);
+  document.getElementById('wdOsTotal').textContent=f(receive);
+  document.getElementById('wdCheckoutBtn').textContent='Withdraw — $'+wdAmount.toFixed(2);
+}
+
+function handleWdCheckout(){
+  if(wdAmount<=0){showToast('Enter a valid amount');return}
+  if(!wdBank){showToast('Select a linked bank account');return}
+  const bk=BANKS[wdBank];
+  const inr=wdAmount*RATE;
+  const f=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2});
+  /* Populate confirm screen */
+  document.getElementById('wdConfUSD').textContent='$'+wdAmount.toFixed(2);
+  document.getElementById('wdConfINR').textContent=f(inr);
+  document.getElementById('wdConfPayAmt').textContent=f(inr);
+  /* Bank header details */
+  const logo=document.getElementById('wdConfBankLogo');
+  if(logo)logo.style.background=bk.color;
+  const logoTxt=document.getElementById('wdConfBankLogoText');
+  if(logoTxt)logoTxt.textContent=bk.short;
+  const bankLabel=document.getElementById('wdConfBankLabel');
+  if(bankLabel)bankLabel.textContent=bk.name+' — Savings A/C';
+  const bankAcc=document.getElementById('wdConfBankAcc');
+  if(bankAcc)bankAcc.textContent='Account ••••'+bk.acc;
+  goWithLoading('sc-wdotp','Preparing verification...','Confirming withdrawal details');
+}
+
+function handleWdPay(){
+  if(getOtp('wdOtpGrid').length<6)return;
+  const bk=BANKS[wdBank];
+  const inr=wdAmount*RATE;
+  const f=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2});
+  const nb=1247.50-wdAmount;
+  document.getElementById('wdSuccessAmt').textContent='$'+wdAmount.toFixed(2)+' Withdrawn!';
+  document.getElementById('wdSuccessUSD').textContent='$'+wdAmount.toFixed(2);
+  document.getElementById('wdSuccessCredit').textContent=f(inr);
+  document.getElementById('wdSuccessBank').textContent=bk.name+' ••••'+bk.acc;
+  document.getElementById('wdSuccessNewBal').textContent='$'+nb.toFixed(2);
+  document.getElementById('wdTxnIdVal').textContent='DEC-WDR-'+Date.now().toString().slice(-10);
+  /* Set current date/time */
+  const now=new Date();
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const h=now.getHours(),m=now.getMinutes();
+  const dateEl=document.getElementById('wdSuccessDate');
+  if(dateEl)dateEl.textContent=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+', '+(h%12||12)+':'+(m<10?'0':'')+m+' '+(h<12?'AM':'PM');
+  goWithLoading('sc-wdsuccess','Processing withdrawal...','Initiating INR transfer');
 }
 </script>
 
